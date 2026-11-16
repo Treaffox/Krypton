@@ -111,6 +111,32 @@ async function run(type, name) {
   await browser.close();
 }
 
+// Fester Link /latest/: immer die neueste Version, CORS, no-cache mit ETag.
+{
+  const h = local ? { "X-Forwarded-Proto": "https", Origin: "https://fremd.example" } : { Origin: "https://fremd.example" };
+  const get = (p) => fetch(BASE + p, { headers: h });
+  const ver = await (await get("/latest/version.json")).json();
+  const css = await get("/latest/krypton.css");
+  const cssText = await css.text();
+  ok(css.status === 200 && (css.headers.get("content-type") || "").startsWith("text/css"), "/latest/krypton.css: 200 und text/css");
+  ok(cssText.includes(`Krypton ${ver.version}`), "/latest/krypton.css nennt die aktuelle Version");
+  ok(/font-weight: 200 900/.test(cssText) && /font-style: italic/.test(cssText), "/latest/krypton.css: Variable Gewichte, aufrecht und kursiv");
+  for (const f of ["Krypton-VF.woff2", "Krypton-Italic-VF.woff2"]) {
+    ok(cssText.includes(`url("${f}")`), `/latest/krypton.css verweist auf ${f}`);
+    const r = await get("/latest/" + f);
+    const b = Buffer.from(await r.arrayBuffer());
+    ok(r.status === 200 && b.subarray(0, 4).toString() === "wOF2", `/latest/${f}: 200 und WOFF2`);
+    ok(r.headers.get("access-control-allow-origin") === "*", `/latest/${f}: CORS erlaubt fremde Seiten`);
+    ok(/no-cache/.test(r.headers.get("cache-control") || "") && !!r.headers.get("etag"), `/latest/${f}: no-cache mit ETag`);
+    const pinned = Buffer.from(await (await get("/assets/fonts/" + f)).arrayBuffer());
+    ok(b.equals(pinned), `/latest/${f} gleicht der Schrift der Seite`);
+  }
+  ok((css.headers.get("access-control-allow-origin") || "") === "*", "/latest/krypton.css: CORS");
+  const z = await get("/latest/Krypton-latest.zip");
+  ok(z.status === 200 && Buffer.from(await z.arrayBuffer()).subarray(0, 2).toString() === "PK", "/latest/Krypton-latest.zip: 200 und ZIP");
+  ok((await get("/latest/gibt-es-nicht.woff2")).status === 404, "/latest/ unbekannte Datei: 404");
+}
+
 await run(chromium, "chromium");
 await run(firefox, "firefox");
 console.log(`${passes} bestanden, ${fails} fehlgeschlagen`);

@@ -24,17 +24,39 @@ Quell-Repository unter `fonts/`.
 
 ## Im Web einbinden
 
+**Empfohlen: fester Link.** Unter `https://krypton.trfx.de/latest/krypton.css` liegt
+immer die neueste Version, ebenso die Schriftdateien im Ordner `/latest/` (gleiche
+Namen, ohne Versionsnummer). Wird Krypton aktualisiert, muss keine App geändert
+werden. Dazu `Krypton-latest.zip` und `version.json`. Die Adressen antworten mit
+`Cache-Control: no-cache` (Browser fragen per ETag nach und laden nur bei neuer
+Version neu) und erlauben fremde Seiten (CORS).
+
+```html
+<link rel="stylesheet" href="https://krypton.trfx.de/latest/krypton.css">
+<style>code, pre, kbd, samp { font-family: "Krypton", ui-monospace, monospace; }</style>
+```
+
+**Fallback: selbst hosten.** Ist der Link nicht erreichbar oder erlaubt die App keine
+fremden Quellen, lädt sie die neueste Version selbst herunter und liefert sie von
+der eigenen Domain aus. `https://krypton.trfx.de/latest/version.json` nennt die aktuelle
+Version, daran erkennt die App, ob ihre Kopie noch aktuell ist.
+
+```sh
+curl -fsSLO https://krypton.trfx.de/latest/Krypton-VF.woff2
+curl -fsSLO https://krypton.trfx.de/latest/Krypton-Italic-VF.woff2
+```
+
 ```css
 @font-face {
   font-family: "Krypton";
-  src: url("Krypton[wght].woff2") format("woff2");
+  src: url("/fonts/Krypton-VF.woff2") format("woff2");
   font-weight: 200 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Krypton";
-  src: url("Krypton-Italic[wght].woff2") format("woff2");
+  src: url("/fonts/Krypton-Italic-VF.woff2") format("woff2");
   font-weight: 200 900;
   font-style: italic;
   font-display: swap;

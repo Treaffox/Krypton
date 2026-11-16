@@ -365,21 +365,45 @@ def section(num, sid, title, lead, inner, cls=""):
 </section>"""
 
 
+STABLE_CSS = """/* Krypton {{V}} – https://krypton.trfx.de/ – SIL Open Font License 1.1
+   Fester Link: liegt immer die neueste Version. Nur diese Datei einbinden. */
+@font-face {
+  font-family: "Krypton";
+  src: url("Krypton-VF.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Krypton";
+  src: url("Krypton-Italic-VF.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+"""
+
+
 def build():
     if OUT.exists():
         shutil.rmtree(OUT)
-    for d in ("assets/fonts", "assets/brand", "downloads"):
+    for d in ("assets/fonts", "assets/brand", "downloads", "latest"):
         (OUT / d).mkdir(parents=True)
 
     web = C.DIST / "webfonts"
     shutil.copy(web / f"{C.FILE_STEM}[wght].woff2", OUT / "assets/fonts/Krypton-VF.woff2")
     shutil.copy(web / f"{C.FILE_STEM}-Italic[wght].woff2", OUT / "assets/fonts/Krypton-Italic-VF.woff2")
+    # Fester Link: immer die neueste Version, Dateinamen ohne Version.
+    shutil.copy(web / f"{C.FILE_STEM}[wght].woff2", OUT / "latest/Krypton-VF.woff2")
+    shutil.copy(web / f"{C.FILE_STEM}-Italic[wght].woff2", OUT / "latest/Krypton-Italic-VF.woff2")
+    (OUT / "latest/krypton.css").write_text(STABLE_CSS.replace("{{V}}", V))
     shutil.copy(STATIC / "brand" / "trfx-logo.svg", OUT / "assets/brand" / "trfx-logo.svg")
     fav = Image.open(STATIC / "brand/favicon.png").convert("RGBA")
     fav.resize((64, 64), Image.LANCZOS).save(OUT / "assets/brand/favicon-64.png", optimize=True)
     fav.resize((180, 180), Image.LANCZOS).save(OUT / "assets/brand/apple-touch-icon.png", optimize=True)
     zip_name = f"{C.FILE_STEM}-{V}.zip"
     build_zip(OUT / "downloads" / zip_name)
+    shutil.copy(OUT / "downloads" / zip_name, OUT / "latest/Krypton-latest.zip")
     shutil.copy(C.ROOT / "LICENSE", OUT / "downloads/LICENSE.txt")
     for p in sorted((C.DIST / "variable").glob("*.ttf")) + sorted(web.glob("*[[]wght[]].woff2")):
         shutil.copy(p, OUT / "downloads" / p.name)
@@ -511,21 +535,31 @@ def build():
 <tbody>{feat_rows}</tbody></table></div>
 <p class="fnote">Die Code-Ligaturen <code>-&gt; &lt;- &lt;-&gt; =&gt; == === != !==</code> sind standardmäßig aus. In VS Code schaltet <code>"editor.fontLigatures": "'ss10'"</code> sie ein, im Web <code>font-feature-settings: "ss10"</code>. Längere Folgen wie <code>--&gt;</code> oder <code>&lt;=&gt;</code> und Ausdrücke wie <code>a&lt;-1</code> bleiben unverändert.</p>""")
 
-    css_snip = """@font-face {
+    css_snip = """<link rel="stylesheet" href="https://krypton.trfx.de/latest/krypton.css">
+
+<style>
+  code, pre, kbd, samp { font-family: "Krypton", ui-monospace, monospace; }
+</style>"""
+    css_self = """@font-face {
   font-family: "Krypton";
-  src: url("Krypton[wght].woff2") format("woff2");
+  src: url("/fonts/Krypton-VF.woff2") format("woff2");
   font-weight: 200 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Krypton";
-  src: url("Krypton-Italic[wght].woff2") format("woff2");
+  src: url("/fonts/Krypton-Italic-VF.woff2") format("woff2");
   font-weight: 200 900;
   font-style: italic;
   font-display: swap;
 }
 code, pre, kbd, samp { font-family: "Krypton", ui-monospace, monospace; }"""
+    fetch_snip = """# Neueste Version holen und selbst hosten
+mkdir -p fonts && cd fonts
+curl -fsSLO https://krypton.trfx.de/latest/Krypton-VF.woff2
+curl -fsSLO https://krypton.trfx.de/latest/Krypton-Italic-VF.woff2
+curl -fsS https://krypton.trfx.de/latest/version.json   # welche Version ist das?"""
     vscode = """{
   "editor.fontFamily": "Krypton, monospace",
   "editor.fontSize": 14,
@@ -551,9 +585,18 @@ code, pre, kbd, samp { font-family: "Krypton", ui-monospace, monospace; }"""
   </a>
   <ul class="dl__files">{file_rows}</ul>
 </div>
+<div class="embed">
+<h3>Einbinden: fester Link</h3>
+<p>Apps binden Krypton über <a href="latest/krypton.css"><code>https://krypton.trfx.de/latest/krypton.css</code></a> ein. Unter diesem Link und unter den gleichen Dateinamen im Ordner <code>/latest/</code> liegt immer die neueste Version. Wenn eine neue Schrift erscheint, muss keine App angepasst werden. Dort liegen auch <code>Krypton-latest.zip</code> (komplettes Paket) und <code>version.json</code> (aktuelle Version). Die Adressen antworten mit <code>Cache-Control: no-cache</code> und erlauben die Einbindung von fremden Seiten (CORS). Browser fragen kurz per ETag nach und laden nur bei einer neuen Version neu.</p>
+<p><strong>Fallback:</strong> Ist der Link nicht erreichbar oder darf die App keine fremden Quellen laden (strenge CSP, Offline, Datenschutz), lädt sie die neueste Version selbst herunter und liefert sie von der eigenen Domain aus. Die Version steht in <a href="latest/version.json"><code>/latest/version.json</code></a>, daran lässt sich erkennen, ob die lokale Kopie noch aktuell ist.</p>
+</div>
 <div class="snips">
-  <div class="code"><div class="code__bar"><span>CSS</span><button type="button" class="code__copy" data-copy="#css-snippet">Kopieren</button></div>
+  <div class="code"><div class="code__bar"><span>HTML · fester Link (empfohlen)</span><button type="button" class="code__copy" data-copy="#css-snippet">Kopieren</button></div>
   <pre id="css-snippet" tabindex="0"><code>{esc(css_snip)}</code></pre></div>
+  <div class="code"><div class="code__bar"><span>Shell · Fallback: neueste Version holen</span><button type="button" class="code__copy" data-copy="#fetch-snippet">Kopieren</button></div>
+  <pre id="fetch-snippet" tabindex="0"><code>{esc(fetch_snip)}</code></pre></div>
+  <div class="code"><div class="code__bar"><span>CSS · Fallback: selbst gehostet</span><button type="button" class="code__copy" data-copy="#css-self-snippet">Kopieren</button></div>
+  <pre id="css-self-snippet" tabindex="0"><code>{esc(css_self)}</code></pre></div>
   <div class="code"><div class="code__bar"><span>VS Code · settings.json</span><button type="button" class="code__copy" data-copy="#vscode-snippet">Kopieren</button></div>
   <pre id="vscode-snippet" tabindex="0"><code>{esc(vscode)}</code></pre></div>
 </div>
@@ -573,9 +616,11 @@ code, pre, kbd, samp { font-family: "Krypton", ui-monospace, monospace; }"""
 <p class="hero__lead">Diese Seite gibt es nicht. Zur <a href="/">Startseite</a>.</p></div></section>"""
     (OUT / "404.html").write_text(page("Nicht gefunden – Krypton", nf, "Seite nicht gefunden."), encoding="utf-8")
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n")
-    (OUT / "version.json").write_text(json.dumps(
+    vj = json.dumps(
         {"name": "Krypton", "version": V, "characters": n_chars, "glyphs": n_glyphs,
-         "license": "OFL-1.1", "download": "/" + dl(zip_name)}, ensure_ascii=False, indent=1) + "\n")
+         "license": "OFL-1.1", "download": "/" + dl(zip_name)}, ensure_ascii=False, indent=1) + "\n"
+    (OUT / "version.json").write_text(vj)
+    (OUT / "latest/version.json").write_text(vj)
     total = sum(p.stat().st_size for p in OUT.rglob("*") if p.is_file())
     print(f"site/dist: {sum(1 for p in OUT.rglob('*') if p.is_file())} Dateien, {human(total)}; "
           f"{n_chars} Zeichen, {n_glyphs} Glyphen, ZIP {human(sizes[zip_name])}")
