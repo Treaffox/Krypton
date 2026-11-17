@@ -291,6 +291,7 @@ select { font: inherit; font-size: 14px; color: var(--fg); background: var(--sur
 @media (max-width: 640px) {
   body { font-size: 14px; }
   .ver { display: none; }
+  .nav__gh { order: -1; }
   .top__inner { gap: 14px; }
   .brand { gap: 8px; }
   .brand__logo { height: 12px; }
@@ -312,3 +313,16 @@ select { font: inherit; font-size: 14px; color: var(--fg); background: var(--sur
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .hero__cursor { animation: none; } }
 .fnote { margin-top: 1rem; max-width: 70ch; color: var(--muted, inherit); font-size: .95rem; }
 .fnote code { overflow-wrap: anywhere; }
+
+/* GitHub-Verlinkungen (Open Source) */
+.gh { flex: none; vertical-align: -3px; }
+.nav__gh { display: inline-flex; align-items: center; gap: 6px; }
+.nav__gh .gh { width: 16px; height: 16px; vertical-align: 0; }
+.btn--gh { align-items: center; }
+.btn--gh .gh { align-self: center; vertical-align: 0; }
+.oss { margin-top: 40px; max-width: 780px; }
+.oss h3 { display: flex; align-items: center; gap: 10px; font-size: 18px; margin-bottom: 8px; }
+.oss p { margin: 0; color: var(--muted); }
+.oss__links { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.foot__gh { display: inline-flex; align-items: center; gap: 6px; }
+.foot__gh .gh { width: 15px; height: 15px; vertical-align: 0; }

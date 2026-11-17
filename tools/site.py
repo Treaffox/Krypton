@@ -28,6 +28,8 @@ OUT = SITE / "dist"
 V = C.VERSION
 VF_UP = C.DIST / "variable" / f"{C.FILE_STEM}[wght].ttf"
 
+GITHUB_URL = "https://github.com/Treaffox/Krypton"
+GH_ICON = '<svg class="gh" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.295 24 17.8 24 12.5 24 5.87 18.627.5 12 .5z"/></svg>'
 FOOTER_LINKS = [
     ("Datenschutz", "https://www.trfx.de/dsb"), ("AGB", "https://www.trfx.de/agb"),
     ("Impressum", "https://www.trfx.de/impressum"), ("Kontakt", "https://www.trfx.de/contact"),
@@ -333,7 +335,7 @@ def page(title, body, desc):
     <nav class="nav" aria-label="Hauptnavigation">
       <a href="/#tester">Tester</a><a href="/#code">Code</a><a href="/#gewichte">Gewichte</a>
       <a href="/#prinzip">Prinzip</a><a href="/#zeichen">Zeichen</a><a href="/#features">Features</a>
-      <a href="/#download">Download</a><a href="/#aenderungen">Änderungen</a>
+      <a href="/#download">Download</a><a href="/#aenderungen">Änderungen</a><a class="nav__gh" href="{GITHUB_URL}" target="_blank" rel="noopener noreferrer" title="Krypton auf GitHub (Open Source)">{GH_ICON}GitHub</a>
     </nav>
     <span class="ver" title="Aktuelle Version">v{V}</span>
   </div>
@@ -345,6 +347,7 @@ def page(title, body, desc):
   <div class="wrap foot__inner">
     <p class="foot__copy">© <span data-year>{date.today().year}</span> TRFX.DE - Alle Rechte vorbehalten.</p>
     <ul class="foot__links">
+      <li><a class="foot__gh" href="{GITHUB_URL}" target="_blank" rel="noopener noreferrer">{GH_ICON}Krypton auf GitHub</a></li>
       {"".join(f'<li><a href="{u}" target="_blank" rel="noopener noreferrer">{esc(t)}</a></li>' for t, u in FOOTER_LINKS)}
     </ul>
   </div>
@@ -427,6 +430,7 @@ def build():
     <div class="hero__cta">
       <a class="btn btn--solid" href="{dl(zip_name)}" download>Herunterladen <span class="btn__meta">ZIP · {human(sizes[zip_name])}</span></a>
       <a class="btn" href="/#tester">Ausprobieren</a>
+      <a class="btn btn--gh" href="{GITHUB_URL}" target="_blank" rel="noopener noreferrer">{GH_ICON}Auf GitHub <span class="btn__meta">Open Source</span></a>
     </div>
     <dl class="facts">
       <div><dt>Gewichte</dt><dd>200–900</dd></div>
@@ -600,8 +604,16 @@ curl -fsS https://krypton.trfx.de/latest/version.json   # welche Version ist das
   <div class="code"><div class="code__bar"><span>VS Code · settings.json</span><button type="button" class="code__copy" data-copy="#vscode-snippet">Kopieren</button></div>
   <pre id="vscode-snippet" tabindex="0"><code>{esc(vscode)}</code></pre></div>
 </div>
+<div class="oss"><h3>{GH_ICON}Open Source auf GitHub</h3>
+<p>Quellcode, Build-Skripte und Schriftquellen liegen öffentlich auf GitHub.</p>
+<ul class="oss__links">
+<li><a href="{GITHUB_URL}" target="_blank" rel="noopener noreferrer">Repository</a></li>
+<li><a href="{GITHUB_URL}/issues" target="_blank" rel="noopener noreferrer">Issues</a></li>
+<li><a href="{GITHUB_URL}/releases" target="_blank" rel="noopener noreferrer">Releases</a></li>
+<li><a href="{GITHUB_URL}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Lizenz im Repository</a></li>
+</ul></div>
 <div class="license"><h3>Lizenz</h3>
-<p>Krypton steht unter der <a href="downloads/LICENSE.txt">SIL Open Font License 1.1</a>. Die Schrift darf frei benutzt, eingebettet, weitergegeben und verändert werden, auch kommerziell. Nur der Verkauf der Schriftdateien allein ist nicht erlaubt. Veränderte Fassungen dürfen nicht „Krypton“ heißen (Reserved Font Name). Krypton baut auf Source Code Pro (© Adobe) auf, ebenfalls unter der Open Font License.</p></div>""")
+<p>Krypton steht unter der <a href="downloads/LICENSE.txt">SIL Open Font License 1.1</a> (Quellcode auf <a href="{GITHUB_URL}" target="_blank" rel="noopener noreferrer">GitHub</a>). Die Schrift darf frei benutzt, eingebettet, weitergegeben und verändert werden, auch kommerziell. Nur der Verkauf der Schriftdateien allein ist nicht erlaubt. Veränderte Fassungen dürfen nicht „Krypton“ heißen (Reserved Font Name). Krypton baut auf Source Code Pro (© Adobe) auf, ebenfalls unter der Open Font License.</p></div>""")
 
     changelog = section("08", "aenderungen", "Änderungen", "",
                         f'<div class="log">{md_to_html((C.ROOT / "CHANGELOG.md").read_text())}</div>')
@@ -618,7 +630,7 @@ curl -fsS https://krypton.trfx.de/latest/version.json   # welche Version ist das
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n")
     vj = json.dumps(
         {"name": "Krypton", "version": V, "characters": n_chars, "glyphs": n_glyphs,
-         "license": "OFL-1.1", "download": "/" + dl(zip_name)}, ensure_ascii=False, indent=1) + "\n"
+         "license": "OFL-1.1", "repository": GITHUB_URL, "download": "/" + dl(zip_name)}, ensure_ascii=False, indent=1) + "\n"
     (OUT / "version.json").write_text(vj)
     (OUT / "latest/version.json").write_text(vj)
     total = sum(p.stat().st_size for p in OUT.rglob("*") if p.is_file())

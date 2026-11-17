@@ -82,7 +82,15 @@ async function run(type, name) {
     ok((await page.locator("[data-ginfo-cp]").textContent()) === "U+00DF", `${tag}: Zeicheninfo`);
     // Footer
     const links = await page.$$eval(".foot__links a", (as) => as.map((a) => [a.target, a.rel]));
-    ok(links.length === 11 && links.every(([t, r]) => t === "_blank" && r.includes("noopener")), `${tag}: Footer-Links ${links.length}`);
+    ok(links.length === 12 && links.every(([t, r]) => t === "_blank" && r.includes("noopener")), `${tag}: Footer-Links ${links.length}`);
+    // GitHub-Verlinkungen (Open Source): Navbar, Hero, Download-Block, Lizenz, Footer, jeweils mit Logo außer Lizenz
+    const GH = "https://github.com/Treaffox/Krypton";
+    const ghs = await page.$$eval("a[href^='https://github.com/Treaffox/Krypton']", (as) => as.map((a) => [a.className, a.target, a.rel, !!a.querySelector("svg.gh")]));
+    ok(ghs.length >= 8 && ghs.every(([, t, r]) => t === "_blank" && r.includes("noopener")), `${tag}: GitHub-Links ${ghs.length}`);
+    for (const c of ["nav__gh", "btn btn--gh", "foot__gh"]) ok(ghs.some(([k, , , svg]) => k === c && svg), `${tag}: GitHub-Link ${c} mit Logo`);
+    ok(await page.locator(".nav__gh").isVisible(), `${tag}: GitHub in Navbar sichtbar`);
+    ok(await page.locator(".hero__cta .btn--gh").isVisible(), `${tag}: GitHub-Button im Hero sichtbar`);
+    ok((await page.locator(".hero__cta .btn").allTextContents()).findIndex((t) => t.includes("GitHub")) === (await page.locator(".hero__cta .btn").allTextContents()).findIndex((t) => t.includes("Ausprobieren")) + 1, `${tag}: GitHub-Button neben Ausprobieren`);
     // Downloads erreichbar
     const hrefs = await page.$$eval('a[download]', (as) => [...new Set(as.map((a) => a.href))]);
     for (const h of hrefs) {
